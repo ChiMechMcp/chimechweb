@@ -158,14 +158,16 @@ chimech-mcp
                 key={item.href}
                 variant={pathname === item.href ? 'secondary' : 'ghost'}
                 className={cn(
-                  'w-full justify-start',
+                  'w-full justify-start h-10',
                   pathname === item.href && 'bg-chime-gold-50 text-chime-gold-700 hover:bg-chime-gold-100'
                 )}
                 asChild
               >
-                <Link href={item.href}>
-                  {item.icon}
-                  <span className="ml-2">{item.title}</span>
+                <Link href={item.href} className="flex items-center">
+                  <span className="flex items-center justify-center w-5 h-5 flex-shrink-0">
+                    {item.icon}
+                  </span>
+                  <span className="ml-3 flex-1">{item.title}</span>
                   {item.badge && (
                     <Badge variant="chime-bronze" className="ml-auto h-5 px-2 text-xs">
                       {item.badge}
@@ -181,38 +183,42 @@ chimech-mcp
             快速操作
           </h2>
           <div className="space-y-1">
-            <Button variant="chime-gold" className="w-full justify-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M8 12l2 2 4-4" />
-              </svg>
-              <span className="ml-2">创建员工</span>
+            <Button variant="chime-gold" className="w-full justify-start h-10">
+              <span className="flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M8 12l2 2 4-4" />
+                </svg>
+              </span>
+              <span className="ml-3">创建员工</span>
             </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              <span className="ml-2">获取支持</span>
+            <Button variant="outline" className="w-full justify-start h-10">
+              <span className="flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </span>
+              <span className="ml-3">获取支持</span>
             </Button>
           </div>
         </div>
