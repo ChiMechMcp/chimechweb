@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "build:export": "next build && next export",
+    "build:cloudflare": "next build",
+    "deploy": "wrangler pages deploy out",
+    "deploy:preview": "wrangler pages deploy out --env preview",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -35,7 +38,8 @@
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.20.5"
   },
   "devDependencies": {
     "eslint": "^8",

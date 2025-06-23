@@ -1,0 +1,19 @@
+name = "chimech-mcp-web"
+compatibility_date = "2024-06-01"
+pages_build_output_dir = "out"
+
+[env.production]
+compatibility_date = "2024-06-01"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "chimech"
+database_id = "3080e1ec-3ba8-4e48-ad8d-1c8095014f41"
+
+[env.preview]
+compatibility_date = "2024-06-01"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "chimech"
+database_id = "3080e1ec-3ba8-4e48-ad8d-1c8095014f41" 
