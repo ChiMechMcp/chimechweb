@@ -152,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (credentials: RegisterCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true)
     try {
-      // 验证
+      // 前端验证
       if (credentials.password !== credentials.confirmPassword) {
         return { success: false, error: '密码确认不匹配' }
       }
@@ -161,9 +161,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: '密码长度至少6位' }
       }
 
-      // Generate username from name if not provided
-      const nameParts = credentials.name.split(' ')
-      const username = nameParts.join('').toLowerCase() + Math.floor(Math.random() * 1000)
+      if (!credentials.name.trim()) {
+        return { success: false, error: '请输入姓名' }
+      }
+
+      if (!credentials.email.trim()) {
+        return { success: false, error: '请输入邮箱地址' }
+      }
 
       const response = await fetch('/api/auth/register/', {
         method: 'POST',
@@ -171,11 +175,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username,
+          name: credentials.name,
           email: credentials.email,
           password: credentials.password,
-          firstName: nameParts[0],
-          lastName: nameParts.slice(1).join(' ') || undefined,
+          confirmPassword: credentials.confirmPassword,
         }),
       })
 
@@ -188,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: `${apiUser.first_name || ''} ${apiUser.last_name || ''}`.trim() || apiUser.username,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.username}`,
-          role: apiUser.role,
+          role: apiUser.role || 'user',
           company: credentials.company,
           preferences: {
             theme: 'system',
@@ -199,12 +202,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             plan: 'free',
             features: ['basic_employees', 'basic_analytics']
           },
-          createdAt: new Date(apiUser.created_at),
-          updatedAt: new Date(apiUser.updated_at)
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
         
         setUser(mappedUser)
-        localStorage.setItem('auth_token', data.token)
         localStorage.setItem('user_data', JSON.stringify(mappedUser))
         
         return { success: true }
@@ -212,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: data.error || '注册失败' }
       }
     } catch (error) {
-      console.error('Registration error:', error)
+      console.error('Register error:', error)
       return { success: false, error: '注册失败，请稍后重试' }
     } finally {
       setIsLoading(false)

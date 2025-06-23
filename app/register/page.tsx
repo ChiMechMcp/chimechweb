@@ -60,6 +60,9 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // 清除之前的错误
+    setErrors({})
+    
     if (!validateForm()) {
       return
     }

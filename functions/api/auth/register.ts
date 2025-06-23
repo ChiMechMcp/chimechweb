@@ -23,33 +23,6 @@ async function hashPassword(password: string): Promise<string> {
     .join('');
 }
 
-// Initialize database tables
-async function initDatabase(db: D1Database) {
-  try {
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        company TEXT,
-        phone TEXT,
-        password_hash TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    
-    await db.exec(`
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)
-    `);
-    
-    console.log('Database tables initialized successfully');
-  } catch (error) {
-    console.error('Database initialization error:', error);
-    throw error;
-  }
-}
-
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
   
@@ -64,21 +37,28 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
     
-    // Initialize database
-    await initDatabase(env.DB);
-    
     // Parse request body
     const body = await request.json() as {
-      name: string;
+      name?: string;
+      first_name?: string;
+      last_name?: string;
       email: string;
-      company?: string;
-      phone?: string;
       password: string;
-      confirmPassword: string;
+      confirmPassword?: string;
     };
     
+    // Extract first_name and last_name from name if provided
+    let firstName = body.first_name || '';
+    let lastName = body.last_name || '';
+    
+    if (body.name && !firstName && !lastName) {
+      const nameParts = body.name.trim().split(' ');
+      firstName = nameParts[0] || '';
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
+    
     // Validate required fields
-    if (!body.name || !body.email || !body.password) {
+    if (!firstName || !body.email || !body.password) {
       return new Response(JSON.stringify({ 
         error: '请填写所有必填字段' 
       }), {
@@ -87,8 +67,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
     
-    // Validate password match
-    if (body.password !== body.confirmPassword) {
+    // Validate password match if confirmPassword is provided
+    if (body.confirmPassword && body.password !== body.confirmPassword) {
       return new Response(JSON.stringify({ 
         error: '密码确认不匹配' 
       }), {
@@ -125,15 +105,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     // Hash password
     const passwordHash = await hashPassword(body.password);
     
+    // Generate username from email
+    const username = body.email.split('@')[0];
+    
     // Insert new user
     const result = await env.DB.prepare(`
-      INSERT INTO users (name, email, company, phone, password_hash)
+      INSERT INTO users (username, email, first_name, last_name, password_hash)
       VALUES (?, ?, ?, ?, ?)
     `).bind(
-      body.name,
+      username,
       body.email,
-      body.company || null,
-      body.phone || null,
+      firstName,
+      lastName,
       passwordHash
     ).run();
     
@@ -142,15 +125,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
     
     // Return success response (don't include sensitive data)
-    const userId = Date.now(); // Use timestamp as unique ID
     return new Response(JSON.stringify({ 
       success: true,
       message: '注册成功！请登录您的账户',
       user: {
-        id: userId,
-        name: body.name,
+        id: Date.now(), // Use timestamp as unique ID
+        username: username,
         email: body.email,
-        company: body.company
+        first_name: firstName,
+        last_name: lastName
       }
     }), {
       status: 201,

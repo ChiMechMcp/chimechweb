@@ -5,10 +5,11 @@ export interface Env {
 
 interface User {
   id: number;
-  name: string;
+  username: string;
   email: string;
-  company?: string;
-  phone?: string;
+  first_name: string;
+  last_name: string;
+  role: string;
   created_at: string;
 }
 
@@ -77,7 +78,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     
     // Find user by email and password
     const user = await env.DB.prepare(`
-      SELECT id, name, email, company, phone, created_at
+      SELECT id, username, email, first_name, last_name, role, created_at
       FROM users 
       WHERE email = ? AND password_hash = ?
     `).bind(body.email, passwordHash).first() as User | null;
@@ -101,10 +102,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       token,
       user: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         email: user.email,
-        company: user.company,
-        phone: user.phone,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role: user.role,
         createdAt: user.created_at
       }
     }), {
